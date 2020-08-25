@@ -1,0 +1,83 @@
+﻿@page "/customer"
+@inject HttpClient http
+@inject IJSRuntime js
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
+<h3>CustomerIndex</h3>
+
+<div class="form-group">
+    <a class="btn btn-success" href="customer/create">New Customer</a>
+    <RadzenLink Icon="" Path="customer/create" Text="Add Customers" class="btn" />
+</div>
+@if (cust == null)
+{
+<img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" />
+ }
+else if (cust.Count == 0)
+{
+<text>There are no records to show</text> }
+else
+{
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>Id</th>
+            <th>Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var customer in cust)
+        {
+<tr>
+    <td>
+        <a class="btn btn-success" href="customer/edit/@customer.Id">Edit</a>
+        <a class="btn btn-warning" @onclick="@(()=> Delete(customer.Id))">Delete</a>
+    </td>
+    <td>
+        @customer.Id
+    </td>
+    <td>
+        @customer.Nama
+    </td>
+</tr>
+}
+    </tbody>
+</table>}
+
+
+@code { 
+    string text = "Add Customer";
+
+
+    List<Customer> cust { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //try
+        //{
+        //    await LoadData();
+        //}
+        //catch (AccessTokenNotAvailableException exception)
+        //{
+        //    exception.Redirect();
+        //}
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        cust = await http.GetFromJsonAsync<List<Customer>>("api/customer");
+    }
+
+    async Task Delete(int customerId)
+    {
+        var itemSelected = cust.First(x => x.Id == customerId);
+        if (await js.InvokeAsync<bool>("confirm", $"Yakin Hapus {itemSelected.Nama} ?"))
+        {
+            await http.DeleteAsync($"api/customer/{customerId}");
+            await LoadData();
+        }
+    } }

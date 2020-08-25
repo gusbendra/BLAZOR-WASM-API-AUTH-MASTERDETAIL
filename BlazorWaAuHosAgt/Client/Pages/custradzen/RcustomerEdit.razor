@@ -1,0 +1,49 @@
+﻿@page "/rcustomer/edit/{CustomerId:int}"
+@inject HttpClient http
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+@using  System.Text.Json
+
+<h3>Edit Customer</h3>
+
+@if (customer == null)
+{
+<img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" />
+ }
+            else
+            {
+
+<RcustomerForm customer="customer" OnValidSubmit="OnValidSubmit" />}
+
+@code { [Parameter] public int CustomerId { get; set; }
+    private Customer customer;
+
+    protected async override Task OnInitializedAsync()
+    {
+        var response = await http.GetAsync($"api/customer/{CustomerId}");
+
+        if (response.IsSuccessStatusCode)
+        {
+            customer = JsonSerializer.Deserialize<Customer>(await response.Content.ReadAsStringAsync(), new JsonSerializerOptions() { PropertyNameCaseInsensitive = true });
+        }
+        else
+        {
+            // Error, likely a 404
+            navigationManager.NavigateTo("rcustomer");
+        }
+    }
+
+    private async Task OnValidSubmit()
+    {
+        var response = await http.PutAsJsonAsync("api/customer", customer);
+
+        if (response.IsSuccessStatusCode)
+        {
+            notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Edit Data Berhasil..!!"});
+            navigationManager.NavigateTo("rcustomer");
+        }
+        else
+        {
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+        }
+    } }

@@ -1,0 +1,30 @@
+﻿@page "/rcustomer/create"
+@inject HttpClient http
+@inject NavigationManager navigationManager
+@inject NotificationService notificationService
+
+<h3>Customer Create</h3>
+
+<RcustomerForm customer="customer" OnValidSubmit="OnValidSubmit" />
+
+@code { Customer customer = new Customer();
+
+    private async Task OnValidSubmit()
+    {
+        var response = await http.PostAsJsonAsync("api/customer", customer);
+
+        var body = await response.Content.ReadAsStringAsync();
+
+        if (response.IsSuccessStatusCode)
+        {
+            // success
+            notificationService.Notify(new NotificationMessage() { Severity = NotificationSeverity.Success, Summary = "Input Data", Detail = "Data baru berhasil di input...!" });
+            Console.WriteLine($"the id of the user is: {body}");
+            navigationManager.NavigateTo("rcustomer");
+        }
+        else
+        {
+            // not success
+            Console.WriteLine(body);
+        }
+    } }

@@ -1,0 +1,53 @@
+﻿
+<EditForm Model="customer" OnValidSubmit="OnValidSubmit">
+
+    <div class="form-group">
+        <label for="name">Name</label>
+        <div>
+            <InputText class="form-control" id="name" @bind-Value="@customer.Nama" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="form-group">
+            <button type="button" class="btn btn-secondary"
+                    @onclick="@(() => customer.Alamat.Add(new Custalamat()))">
+                Add Address
+            </button>
+        </div>
+
+        @for (var i = 0; i < customer.Alamat.Count; i++)
+        {
+            var index = i;
+            var alamat = customer.Alamat[i];
+
+<h5>Alamat @(i+1)</h5>
+
+                    <div class="form-group">
+                        <label>Street:</label>
+                        <InputText class="form-control" @bind-Value="alamat.Jalan" />
+                    </div>
+
+                                        <div class="form-group">
+                                            <label>City:</label>
+                                            <InputText class="form-control" @bind-Value="alamat.Jalan" />
+                                        </div>
+
+                                                            <button type="button" class="btn btn-danger"
+                                                                    @onclick="@(() => customer.Alamat.RemoveAt(index))">
+                                                                Remove
+                                                            </button>}
+    </div>
+
+    <button class="btn btn-primary" type="submit">Send</button>
+    <button class="btn btn-secondary" type="button" @onclick="Clear">Clear</button>
+
+</EditForm>
+
+@code { [Parameter] public Customer customer { get; set; }
+    [Parameter] public EventCallback OnValidSubmit { get; set; }
+
+    private void Clear()
+    {
+        customer = new Customer();
+    } }

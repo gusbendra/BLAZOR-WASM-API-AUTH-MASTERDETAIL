@@ -1,0 +1,75 @@
+﻿@page "/rcustomer"
+@inject HttpClient http
+@inject IJSRuntime js
+@inject NavigationManager NavigationManager
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@attribute [Authorize]
+
+<h3>CustomerIndex</h3>
+
+<div class="form-group">
+    <a class="btn btn-success" href="rcustomer/create">New Customer r</a>
+    <RadzenLink Icon="accessibility" Path="rcustomer/create" Text="Add Customers r" class="btn" />
+</div>
+
+@if (cust == null)
+{
+<img src="https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif" /> 
+}
+else if (cust.Count == 0)
+{
+    <text>There are no records to show</text>
+}
+else
+{
+    <RadzenGrid AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+            AllowSorting="true" Data="@cust" TItem="Customer" ColumnWidth="200px">
+        <Columns>
+            <RadzenGridColumn TItem="Customer" Property="Id" Title="Customer ID" />
+            <RadzenGridColumn TItem="Customer" Property="Nama" Title="Nama" />
+            <RadzenGridColumn TItem="Customer" Title="Action" Context="cust" Bubble="false" Filterable="false" Sortable="false" TextAlign="TextAlign.Center" Width="70px">
+            <Template Context="cust">
+                <a class="btn btn-success" href="rcustomer/edit/@cust.Id">Edit</a>
+                <a class="btn btn-warning" @onclick="@(()=> Delete(@cust.Id))">Delete</a>
+            </Template>
+            </RadzenGridColumn>
+
+
+        </Columns>
+    </RadzenGrid>
+}
+
+@code { string text = "Add Customer";
+
+
+    List<Customer> cust { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //try
+        //{
+        //    await LoadData();
+        //}
+        //catch (AccessTokenNotAvailableException exception)
+        //{
+        //    exception.Redirect();
+        //}
+        await LoadData();
+    }
+
+    async Task LoadData()
+    {
+        cust = await http.GetFromJsonAsync<List<Customer>>("api/customer");
+    }
+
+
+    async Task Delete(int customerId)
+    {
+        var itemSelected = cust.First(x => x.Id == customerId);
+        if (await js.InvokeAsync<bool>("confirm", $"Yakin Hapus {itemSelected.Nama} ?"))
+        {
+            await http.DeleteAsync($"api/customer/{customerId}");
+            await LoadData();
+        }
+    } }
