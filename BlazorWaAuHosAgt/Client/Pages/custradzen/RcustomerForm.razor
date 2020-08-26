@@ -1,6 +1,7 @@
 ﻿
 <EditForm Model="customer" OnValidSubmit="OnValidSubmit">
 
+
     <div class="form-group">
         <label for="name">Name</label>
         <div>
@@ -15,32 +16,37 @@
                 Add Address
             </button>
         </div>
-
+     </div>
         @for (var i = 0; i < customer.Alamat.Count; i++)
         {
             var index = i;
             var alamat = customer.Alamat[i];
 
-<h5>Alamat @(i+1)</h5>
-
-                    <div class="form-group">
-                        <label>Street:</label>
-                        <InputText class="form-control" @bind-Value="alamat.Jalan" />
+            
+                <div class="container">
+                        <div class="form-group">
+                        <h5>Alamat @(i + 1)  </h5>
                     </div>
+                    <div class="form-group">
+                        <label> Jalan :</label>
+                        <InputText @bind-Value="alamat.Jalan" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Kota :</label>
+                        <InputText @bind-Value="alamat.Kota" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-danger" @onclick="@(() => customer.Alamat.RemoveAt(index))">Remove</button>
+                    </div>
+                 </div>
+    
+            <br />
+        }
 
-                                        <div class="form-group">
-                                            <label>City:</label>
-                                            <InputText class="form-control" @bind-Value="alamat.Jalan" />
-                                        </div>
-
-                                                            <button type="button" class="btn btn-danger"
-                                                                    @onclick="@(() => customer.Alamat.RemoveAt(index))">
-                                                                Remove
-                                                            </button>}
-    </div>
-
-    <button class="btn btn-primary" type="submit">Send</button>
-    <button class="btn btn-secondary" type="button" @onclick="Clear">Clear</button>
+        <div class="form-group">
+            <button class="btn btn-primary" type="submit">Send</button>
+            <button class="btn btn-secondary" type="button" @onclick="Clear">Clear</button>
+        </div>
 
 </EditForm>
 
